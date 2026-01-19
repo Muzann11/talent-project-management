@@ -46,6 +46,9 @@ Konfigurasi database dipusatkan di `data-source.ts`. Sistem ini menggunakan vari
 
 Sistem ini memiliki keterkaitan data yang cukup kompleks untuk mendukung manajemen talenta:
 
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/9c199a8a-dcc0-4561-bf31-1cd41b3e938d" />
+
+
 * **User** ↔ **Profile** (1:1)
 * **Profile** ↔ **Experience** (1:N)
 * **Profile** ↔ **Project** (1:N)
