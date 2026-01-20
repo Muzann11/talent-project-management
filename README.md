@@ -110,4 +110,3 @@ Proyek ini tidak menyimpan kredensial database langsung di dalam kode. Semua dat
 
 ---
 
-**Next Step:** Apakah kamu ingin saya menambahkan bagian **"How to Use API"** yang berisi contoh query GraphQL untuk dimasukkan ke dalam README tersebut?
