@@ -102,11 +102,3 @@ npm run build
 Dalam proyek ini, `synchronize: true` diaktifkan pada `AppDataSource`.
 
 > **Penjelasan:** Saat aplikasi dijalankan, TypeORM akan secara otomatis melakukan pengecekan antara Entity di kode dengan tabel di database. Jika ada perbedaan, TypeORM akan memodifikasi skema database secara otomatis. Ini sangat mempercepat proses pengembangan awal.
-
-### Security via `.env`
-
-Proyek ini tidak menyimpan kredensial database langsung di dalam kode. Semua data sensitif dipisahkan ke file `.env` yang tidak di-push ke repository (via `.gitignore`), sesuai dengan standar industri **Twelve-Factor App**.
-
-
----
-
