@@ -30,7 +30,10 @@ async function main() {
     const app = express();
 
     await apolloServer.start();
-    apolloServer.applyMiddleware({ app: app as any });
+    apolloServer.applyMiddleware({ 
+        app: app as any,
+        cors: { origin: "http://localhost:3000", credentials: true } 
+    });
 
     app.listen(4000, () => {
         console.log("Server ready at http://localhost:4000/graphql");

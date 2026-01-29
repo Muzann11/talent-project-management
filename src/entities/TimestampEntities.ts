@@ -5,13 +5,13 @@ import { Field, ObjectType } from "type-graphql";
 export abstract class TimestampEntity extends BaseEntity {
     @Field()
     @CreateDateColumn()
-    createdAt: Date; // kapan data pertama kali dibuat
+    createdAt: Date;
 
     @Field()
     @UpdateDateColumn()
-    updatedAt: Date; // kapan data terakhir diubah
+    updatedAt: Date;
 
     @Field({ nullable: true })
     @DeleteDateColumn()
-    deletedAt?: Date; // kapan data "dihapus" (Soft Delete)
+    deletedAt?: Date; // Soft Delete
 }

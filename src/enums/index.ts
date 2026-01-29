@@ -4,6 +4,7 @@ import { registerEnumType } from "type-graphql";
 export enum ProjectStatus {
     OPEN = "open",
     ONGOING = "ongoing",
+    COMPLETED = "completed",
     CLOSED = "closed"
 }
 

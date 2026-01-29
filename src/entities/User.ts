@@ -18,7 +18,7 @@ export class User extends TimestampEntity {
     password: string;
 
     @Field(() => Profile, { nullable: true })
-    @OneToOne(() => Profile, (profile) => profile.user)
+    @OneToOne(() => Profile, (profile) => profile.user, { cascade: true, onDelete: "CASCADE" })
     profile: Profile;
 }
 

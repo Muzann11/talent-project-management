@@ -1,4 +1,5 @@
 import { Resolver, Query, Mutation, Arg , Int} from "type-graphql";
+import { IsNull } from "typeorm";
 import { Experience } from "../entities/Experience";
 import { Profile } from "../entities/Profile";
 
@@ -6,7 +7,7 @@ import { Profile } from "../entities/Profile";
 export class ExperienceResolver {
     @Query(() => [Experience])
     async getExperiences() {
-        return await Experience.find({ relations: ["profile"]});
+        return await Experience.find({ where: { deletedAt: IsNull() }, relations: ["profile"]});
     }
 
     @Mutation(() => Experience)
@@ -21,16 +22,11 @@ export class ExperienceResolver {
         const profile = await Profile.findOneBy({ id: profileId });
         if (!profile) throw new Error("Profil tidak ditemukan!");
 
-        const exp = Experience.create({ 
-            company, 
-            title, 
-            startDate, 
-            description,
-            endDate,
-            profile 
-        });
-        
+        const exp = Experience.create({ company, title, startDate, description, endDate, profile });
         await exp.save();
+
+        await Profile.updateAiContext(profileId);
+
         return exp;
     }
 
@@ -43,7 +39,8 @@ export class ExperienceResolver {
         @Arg("endDate", { nullable: true }) endDate?: string,
         @Arg("description", { nullable: true }) description?: string
     ) {
-        const exp = await Experience.findOneBy({ id });
+        // Ambil data beserta profileId-nya
+        const exp = await Experience.findOne({ where: { id }, relations: ["profile"] });
         if (!exp) throw new Error("Pengalaman tidak ditemukan!");
 
         if (company) exp.company = company;
@@ -52,15 +49,23 @@ export class ExperienceResolver {
         if (endDate) exp.endDate = endDate;
         if (description) exp.description = description;
 
-        return await exp.save();
+        await exp.save();
+
+        await Profile.updateAiContext(exp.profile.id);
+
+        return exp;
     }
+
     @Mutation(() => Experience)
     async deleteExperience(@Arg("id", () => Int) id: number) {
-        // cari data berdasarkan ID
-        const exp = await Experience.findOneBy({ id });
+        const exp = await Experience.findOne({ where: { id }, relations: ["profile"] });
         if (!exp) throw new Error("Pengalaman tidak ditemukan!");
 
-        // gunakan softRemove agar data tetap ada di DB (dengan isi deletedAt)
-        return await Experience.softRemove(exp);
+        const profileId = exp.profile.id;
+        await Experience.softRemove(exp);
+
+        await Profile.updateAiContext(profileId);
+
+        return exp;
     }
 }

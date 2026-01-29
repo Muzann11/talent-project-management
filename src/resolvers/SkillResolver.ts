@@ -1,4 +1,5 @@
 import { Resolver, Query, Mutation, Arg, Int } from "type-graphql";
+import { IsNull } from "typeorm";
 import { Skill } from "../entities/Skill";
 import { Profile } from "../entities/Profile";
 
@@ -6,7 +7,7 @@ import { Profile } from "../entities/Profile";
 export class SkillResolver {
     @Query(() => [Skill])
     async getSkills() {
-        return await Skill.find();
+        return await Skill.find({ where: { deletedAt: IsNull() } });
     }
 
     @Mutation(() => Skill)
@@ -21,10 +22,7 @@ export class SkillResolver {
         @Arg("profileId", () => Int) profileId: number,
         @Arg("skillId", () => Int) skillId: number
     ) {
-        const profile = await Profile.findOne({ 
-            where: { id: profileId }, 
-            relations: ["skills"] 
-        });
+        const profile = await Profile.findOne({ where: { id: profileId }, relations: ["skills"] });
         const skill = await Skill.findOneBy({ id: skillId });
 
         if (!profile || !skill) throw new Error("Data tidak ditemukan!");
@@ -33,6 +31,8 @@ export class SkillResolver {
         if (!isAlreadyExist) {
             profile.skills.push(skill);
             await profile.save();
+            
+            await Profile.updateAiContext(profileId);
         }
 
         return profile;
@@ -57,21 +57,20 @@ export class SkillResolver {
         return await Skill.softRemove(skill);
     }
 
-    // menghapus Skill dari Profile (Memutuskan Relasi Many-to-Many)
     @Mutation(() => Profile)
     async removeSkillFromProfile(
         @Arg("profileId", () => Int) profileId: number,
         @Arg("skillId", () => Int) skillId: number
     ) {
-        const profile = await Profile.findOne({ 
-            where: { id: profileId }, 
-            relations: ["skills"] 
-        });
+        const profile = await Profile.findOne({ where: { id: profileId }, relations: ["skills"] });
 
         if (!profile) throw new Error("Profil tidak ditemukan!");
         profile.skills = profile.skills.filter(s => s.id !== skillId);
         
         await profile.save();
+
+        await Profile.updateAiContext(profileId);
+
         return profile;
     }
 }
